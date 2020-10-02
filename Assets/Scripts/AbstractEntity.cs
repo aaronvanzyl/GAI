@@ -3,31 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class AbstractEntity : IEntity
-{ 
+{
     IEntity parentEntity;
     public int Id { get; set; }
     public float Money { get; set; }
     public Vector2Int Position { get; set; }
     List<Item> inventory;
-    public List<Item> Inventory { 
-        get 
+
+    public Weapon EquippedWeapon
+    {
+        get
         {
-            if (inventory == null)
-            {
-                inventory = new List<Item>();
-                List<Item> parentInventory = parentEntity.Inventory;
-                foreach (Item i in parentInventory)
-                {
-                    inventory.Add(i.Clone());
-                }
-            }
-            return inventory;
-        } 
-        set 
+            return equippedWeapon;
+        }
+        set
         {
-            inventory = value;
+            equippedWeapon = value;
+            AddInventoryItem(value);
         }
     }
+    Weapon equippedWeapon;
 
     public AbstractEntity(IEntity parentEntity)
     {
@@ -37,15 +32,49 @@ public class AbstractEntity : IEntity
         Money = parentEntity.Money;
     }
 
-    public AbstractEntity Clone() {
+    public AbstractEntity GetAbstract()
+    {
         AbstractEntity clone = new AbstractEntity(this);
-        //if (inventory != null) {
-        //    List<Item> invClone = new List<Item>();
-        //    foreach (Item i in inventory) {
-        //        invClone.Add(i.Clone());
-        //    }
-        //    clone.SetInvetory(invClone);
-        //}
         return clone;
+    }
+
+    public IReadOnlyCollection<Item> GetInventory() {
+        if (inventory != null)
+        {
+            return inventory;
+        }
+        else {
+            return parentEntity.GetInventory();
+        }
+    }
+
+    public void AddInventoryItem(Item item) {
+        foreach (Item i in GetInventory()) {
+            if (i == item) {
+                return;
+            }
+        }
+
+        if (inventory == null) {
+            CopyInventory();
+        }
+        inventory.Add(item);
+    }
+
+    public void RemoveInventoryItem(Item item) {
+        if (inventory == null)
+        {
+            CopyInventory();
+        }
+        inventory.Remove(item);
+    }
+
+    void CopyInventory() {
+        inventory = new List<Item>();
+        IReadOnlyCollection<Item> parentInventory = parentEntity.GetInventory();
+        foreach (Item i in parentInventory)
+        {
+            inventory.Add(i.Clone());
+        }
     }
 }

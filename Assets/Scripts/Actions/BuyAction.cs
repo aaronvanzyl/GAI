@@ -36,7 +36,7 @@ public class BuyAction : Action
         if (buyer.Money > salePrice)
         {
             Item item = ItemGenerator.GenerateType(itemType);
-            buyer.Inventory.Add(item);
+            buyer.AddInventoryItem(item);
             buyer.Money = buyer.Money - salePrice;
         }
     }

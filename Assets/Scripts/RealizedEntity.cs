@@ -5,6 +5,24 @@ using UnityEngine;
 public class RealizedEntity : IEntity
 {
     List<Item> inventory = new List<Item>();
+    public Vector2Int Position { get; set; }
+    public int Id { get; set; }
+    public float Money { get; set; }
+
+    public Weapon EquippedWeapon
+    {
+        get
+        {
+            return equippedWeapon;
+        }
+        set
+        {
+            equippedWeapon = value;
+            AddInventoryItem(value);
+        }
+    }
+    Weapon equippedWeapon;
+
     public RealizedEntity() {
     }
 
@@ -12,32 +30,24 @@ public class RealizedEntity : IEntity
         this.Position = position;
     }
 
-    public Vector2Int Position { get; set; }
-
     public IReadOnlyCollection<Item> GetInventory() {
         return inventory.AsReadOnly();
     }
 
     public void AddInventoryItem(Item item) {
-        inventory.Add(item);
+        if (!inventory.Contains(item))
+        {
+            inventory.Add(item);
+        }
     }
 
     public void RemoveInventoryItem(Item item) {
-        if (item == EquipedWeapon) {
-
+        if (item == equippedWeapon) {
+            equippedWeapon = null;
         }
         inventory.Remove(item);
     }
 
-    public void OnEquip() { }
-
-    public int Id { get; set; }
-    public float Money { get; set; }
-    public Weapon EquippedWeapon {
-        get;
-        set {
-            if()
-             }; }
-    Weapon equipedWeapon;
+    
 
 }

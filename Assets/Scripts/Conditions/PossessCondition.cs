@@ -5,7 +5,7 @@ using UnityEngine;
 public class PossessCondition : Condition
 {
     public int ownerId;
-    public int itemType;
+    public ItemFilter itemFilter;
 
     public PossessCondition(int ownerId, int objectType)
     {
@@ -15,7 +15,7 @@ public class PossessCondition : Condition
 
     override public bool Satisfied(IWorldState worldState) {
         IEntity owner = worldState.GetEntity(ownerId);
-        foreach (Item i in owner.Inventory) {
+        foreach (Item i in owner.GetInventory()) {
             if (i.type == itemType) {
                 return true;
             }

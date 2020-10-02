@@ -14,18 +14,11 @@ public class WeaponCondition : Condition
     override public bool Satisfied(IWorldState worldState)
     {
         IEntity owner = worldState.GetEntity(entityId);
-        foreach (Item i in owner.Inventory)
-        {
-            if (i.type == itemType)
-            {
-                return true;
-            }
-        }
-        return false;
+        return owner.EquippedWeapon != null;
     }
 
-    public override string ToString()
-    {
-        return $"entity:{ownerId}\nitem:{itemType}";
-    }
+    //public override string ToString()
+    //{
+    //    return $"entity:{ownerId}\nitem:{itemType}";
+    //}
 }
