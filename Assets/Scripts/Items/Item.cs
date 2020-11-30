@@ -12,6 +12,7 @@ public class Item
     public float foodAmount = 0;
     public bool[] equippable = new bool[numItemSlots];
     public float[] power = new float[numItemSlots];
+    public IEntity equippedBy;
 
     public Item(string name) {
         this.name = name;

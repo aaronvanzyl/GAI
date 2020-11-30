@@ -4,11 +4,27 @@ using UnityEngine;
 
 public class Inventory
 {
-    public IReadOnlyCollection<Item> GetInventory();
-    public void AddInventoryItem(Item item);
-    public void RemoveInventoryItem(Item item);
+    List<Item> items = new List<Item>();
+
+    public IReadOnlyCollection<Item> GetItems() {
+        return items.AsReadOnly();
+    }
+
+    public void AddItem(Item item) {
+        items.Add(item);
+    }
+
+    public void RemoveItem(Item item) {
+        items.Remove(item);
+    }
 
     public List<Item> Filter(ItemFilter filter) {
-        if()
+        List<Item> filtered = new List<Item>();
+        foreach (Item i in items) {
+            if (filter.Satisfied(i)) {
+                filtered.Add(i);
+            }
+        }
+        return filtered;
     }
 }

@@ -8,7 +8,8 @@ public class AbstractEntity : IEntity
     public int Id { get; set; }
     public float Money { get; set; }
     public Vector2Int Position { get; set; }
-    List<Item> inventory;
+    Inventory inventory;
+    Item[] equippedItems; 
 
     public Weapon EquippedWeapon
     {
@@ -38,10 +39,10 @@ public class AbstractEntity : IEntity
         return clone;
     }
 
-    public IReadOnlyCollection<Item> GetInventory() {
+    public IReadOnlyCollection<Item> GetInventoryItems() {
         if (inventory != null)
         {
-            return inventory;
+            return inventory.GetItems();
         }
         else {
             return parentEntity.GetInventory();
@@ -76,5 +77,27 @@ public class AbstractEntity : IEntity
         {
             inventory.Add(i.Clone());
         }
+    }
+
+    public IReadOnlyCollection<Item> GetInventory()
+    {
+        if (equippedItems == null) {
+
+        }
+    }
+
+    public void EquipItem(Item item, ItemSlot slot)
+    {
+        
+    }
+
+    public void UnequipItem(Item item)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public Item GetEquippedItem(ItemSlot slot)
+    {
+        throw new System.NotImplementedException();
     }
 }

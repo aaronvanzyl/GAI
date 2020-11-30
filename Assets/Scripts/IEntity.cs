@@ -8,7 +8,9 @@ public interface IEntity
     IReadOnlyCollection<Item> GetInventory();
     void AddInventoryItem(Item item);
     void RemoveInventoryItem(Item item);
-    Weapon EquippedWeapon { get; set; }
+    void EquipItem(Item item, ItemSlot slot);
+    void UnequipItem(Item item);
+    Item GetEquippedItem(ItemSlot slot);
     int Id { get; set; }
     float Money { get; set; }
 }
