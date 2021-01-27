@@ -16,10 +16,14 @@ public class AITest : MonoBehaviour
         worldState.AddEntity(entity);
 
         Merchant merchant = new Merchant(new Vector2Int(20,30));
-        merchant.saleEntries.Add(0, 23);
+        Item apple = new Item("apple", foodAmount: 10);
+        ItemTemplate appleTemplate = new ItemTemplate(apple);
+        merchant.saleEntries.Add(new SaleEntry(appleTemplate, 6));
         worldState.AddMerchant(merchant);
 
-        Condition possessCond = new PossessCondition(entity.Id, 0);
+        ItemFilter filter = new ItemFilter();
+        filter.minFoodAmount = 1;
+        Condition possessCond = new PossessCondition(entity.Id, filter);
         ConditionNode topNode = PlanGenerator.GeneratePlan(possessCond, worldState, 5, 5);
 
         treeRenderer.RenderTree(topNode);

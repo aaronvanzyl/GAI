@@ -7,16 +7,16 @@ public class PossessCondition : Condition
     public int ownerId;
     public ItemFilter itemFilter;
 
-    public PossessCondition(int ownerId, int objectType)
+    public PossessCondition(int ownerId, ItemFilter itemFilter)
     {
         this.ownerId = ownerId;
-        this.itemType = objectType;
+        this.itemFilter = itemFilter;
     }
 
     override public bool Satisfied(IWorldState worldState) {
         IEntity owner = worldState.GetEntity(ownerId);
         foreach (Item i in owner.GetInventory()) {
-            if (i.type == itemType) {
+            if (itemFilter.Satisfied(i)) {
                 return true;
             }
         }
@@ -25,6 +25,6 @@ public class PossessCondition : Condition
 
     public override string ToString()
     {
-        return $"entity:{ownerId}\nitem:{itemType}";
+        return $"entity:{ownerId}\nitem:{itemFilter}";
     }
 }

@@ -23,8 +23,8 @@ public class NodeTreeRenderer : MonoBehaviour
 
         float offset = -node.width * 0.5f;
         for (int i = 0; i < node.inNodes.Count; i++) {
-            float mainAxisOffset = alignHorizontal ? nodeHeight : - nodeHeight;
-            float orthogonalOffset = (offset + node.inNodes[i].width * 0.5f) * nodeWidth;
+            float mainAxisOffset = alignHorizontal ? -nodeWidth : - nodeHeight;
+            float orthogonalOffset = (offset + node.inNodes[i].width * 0.5f) * (alignHorizontal ? nodeHeight : nodeWidth);
             Vector3 childPos = new Vector3(position.x +( alignHorizontal ? mainAxisOffset : orthogonalOffset), position.y + (alignHorizontal ? orthogonalOffset : mainAxisOffset), position.z);
             RenderTreeRecursive(node.inNodes[i], childPos);
             offset += node.inNodes[i].width;

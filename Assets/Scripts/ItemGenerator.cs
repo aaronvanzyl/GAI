@@ -5,6 +5,6 @@ using UnityEngine;
 public static class ItemGenerator
 {
     public static Item GenerateType(int type) {
-        return new Item(type);
+        return new Item("auto: " + type);
     }
 }

@@ -1,38 +1,32 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+
 
 public class Merchant
 {
     public int id;
     public Vector2Int position;
-    public Dictionary<int, float> saleEntries;
+    public List<SaleEntry> saleEntries;
 
     public Merchant(Vector2Int position)
     {
         this.position = position;
-        saleEntries = new Dictionary<int, float>();
+        saleEntries = new List<SaleEntry>();
     }
 
-    public Merchant(Vector2Int position, Dictionary<int, float> saleEntries) {
+    public Merchant(Vector2Int position, List<SaleEntry> saleEntries) {
         this.position = position;
         this.saleEntries = saleEntries;
     }
 
-    public bool SellsType(int type)
-    {
-        return saleEntries.ContainsKey(type);
-    }
-
-    public float SalePrice(int itemType) {
-        if (saleEntries.ContainsKey(itemType)) {
-            return saleEntries[itemType];
-        }
-        return -1;
-    }
-
     public Merchant Clone() {
-        Merchant clone = new Merchant(position, new Dictionary<int, float>(saleEntries));
+        Merchant clone = new Merchant(position, new List<SaleEntry>());
+        foreach (SaleEntry entry in saleEntries) {
+            clone.saleEntries.Add(entry.Clone());
+        }
         clone.id = id;
         return clone;
     }

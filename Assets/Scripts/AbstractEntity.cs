@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 public class AbstractEntity : IEntity
@@ -8,22 +9,8 @@ public class AbstractEntity : IEntity
     public int Id { get; set; }
     public float Money { get; set; }
     public Vector2Int Position { get; set; }
-    Inventory inventory;
+    List<Item> inventory;
     Item[] equippedItems; 
-
-    public Weapon EquippedWeapon
-    {
-        get
-        {
-            return equippedWeapon;
-        }
-        set
-        {
-            equippedWeapon = value;
-            AddInventoryItem(value);
-        }
-    }
-    Weapon equippedWeapon;
 
     public AbstractEntity(IEntity parentEntity)
     {
@@ -39,10 +26,10 @@ public class AbstractEntity : IEntity
         return clone;
     }
 
-    public IReadOnlyCollection<Item> GetInventoryItems() {
+    public ReadOnlyCollection<Item> GetInventory() {
         if (inventory != null)
         {
-            return inventory.GetItems();
+            return inventory.AsReadOnly();
         }
         else {
             return parentEntity.GetInventory();
@@ -50,10 +37,8 @@ public class AbstractEntity : IEntity
     }
 
     public void AddInventoryItem(Item item) {
-        foreach (Item i in GetInventory()) {
-            if (i == item) {
-                return;
-            }
+        if (GetInventory().Contains(item)) {
+            return;
         }
 
         if (inventory == null) {
@@ -79,25 +64,47 @@ public class AbstractEntity : IEntity
         }
     }
 
-    public IReadOnlyCollection<Item> GetInventory()
+    public void EquipItem(Item item, ItemSlot slot, bool destroyExisting = false)
     {
-        if (equippedItems == null) {
-
+        if (destroyExisting)
+        {
+            if (equippedItems[(int)slot] != null)
+            {
+                RemoveInventoryItem(equippedItems[(int)slot]);
+            }
         }
+        equippedItems[(int)slot] = item;
+        AddInventoryItem(item);
     }
 
-    public void EquipItem(Item item, ItemSlot slot)
+    public void UnequipSlot(ItemSlot slot)
     {
-        
+        equippedItems[(int)slot] = null;
     }
 
     public void UnequipItem(Item item)
     {
-        throw new System.NotImplementedException();
+        for (int i = 0; i < Item.numItemSlots; i++)
+        {
+            if (equippedItems[i].Equals(item))
+            {
+                equippedItems[i] = null;
+            }
+        }
     }
 
     public Item GetEquippedItem(ItemSlot slot)
     {
-        throw new System.NotImplementedException();
+        return equippedItems[(int)slot];
+    }
+
+    public float GetPower() {
+        float power = 0;
+        for (int i = 0; i < equippedItems.Length; i++) {
+            if (equippedItems[i] != null) {
+                power += equippedItems[i].power;
+            }
+        }
+        return power;
     }
 }

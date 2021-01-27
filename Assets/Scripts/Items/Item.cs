@@ -11,11 +11,12 @@ public class Item
     public string name;
     public float foodAmount = 0;
     public bool[] equippable = new bool[numItemSlots];
-    public float[] power = new float[numItemSlots];
-    public IEntity equippedBy;
+    public float power = 0;
 
-    public Item(string name) {
+    public Item(string name, float foodAmount = 0, float power = 0) {
         this.name = name;
+        this.foodAmount = foodAmount;
+        this.power = power;
     }
 
     public virtual Item Clone() {
@@ -23,7 +24,7 @@ public class Item
         clone.foodAmount = foodAmount;
         for (int i = 0; i < numItemSlots; i++) {
             clone.equippable[i] = equippable[i];
-            clone.power[i] = power[i];
+            clone.power = power;
         }
         return clone;
     }

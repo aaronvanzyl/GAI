@@ -5,12 +5,12 @@ using UnityEngine;
 public class BuyAction : Action
 {
     public int buyerId;
-    public int itemType;
+    public int saleEntryIndex;
     public int merchantId;
 
-    public BuyAction(IWorldState worldState, int buyerId, int itemType, int merchantId) {
+    public BuyAction(IWorldState worldState, int buyerId, int saleEntryIndex, int merchantId) {
         this.buyerId = buyerId;
-        this.itemType = itemType;
+        this.saleEntryIndex = saleEntryIndex;
         this.merchantId = merchantId;
         GenerateConditions(worldState);
     }
@@ -18,7 +18,7 @@ public class BuyAction : Action
     public override float EstimateCost(IWorldState worldState)
     {
         Merchant merchant = worldState.GetMerchant(merchantId);
-        float salePrice = merchant.SalePrice(itemType);
+        float salePrice = merchant.saleEntries[saleEntryIndex].price;
         return salePrice;
     }
 
@@ -32,12 +32,12 @@ public class BuyAction : Action
     {
         IEntity buyer = worldState.GetEntity(buyerId);
         Merchant merchant = worldState.GetMerchant(merchantId);
-        float salePrice = merchant.SalePrice(itemType);
+        float salePrice = merchant.saleEntries[saleEntryIndex].price;
         if (buyer.Money > salePrice)
         {
-            Item item = ItemGenerator.GenerateType(itemType);
+            Item item = merchant.saleEntries[saleEntryIndex].itemTemplate.Generate();
             buyer.AddInventoryItem(item);
-            buyer.Money = buyer.Money - salePrice;
+            buyer.Money -= salePrice;
         }
     }
 
@@ -47,12 +47,12 @@ public class BuyAction : Action
         conditions = new List<Condition>();
         LocationCondition locationCond = new LocationCondition(buyerId, merchant.position);
         conditions.Add(locationCond);
-        MoneyCondition moneyCond = new MoneyCondition(buyerId, merchant.SalePrice(itemType));
+        MoneyCondition moneyCond = new MoneyCondition(buyerId, merchant.saleEntries[saleEntryIndex].price);
         conditions.Add(moneyCond);
     }
 
     public override string ToString()
     {
-        return $"buyer:{buyerId}\nitem:{itemType}\nmerchant:{merchantId}";
+        return $"buyer:{buyerId}\nitem:{saleEntryIndex}\nmerchant:{merchantId}";
     }
 }

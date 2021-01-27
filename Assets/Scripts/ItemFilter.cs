@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemFilter : MonoBehaviour
+public class ItemFilter
 {
     public float[] minPower = new float[Item.numItemSlots];
     public float minFoodAmount = 0;
@@ -13,7 +13,7 @@ public class ItemFilter : MonoBehaviour
         }
         bool satisfiesPower = false;
         for (int i = 0; i < Item.numItemSlots; i++) {
-            if (item.equippable[i] && item.power[i] >= minPower[i]) {
+            if (minPower[i] == 0 || (item.equippable[i] && item.power >= minPower[i])) {
                 satisfiesPower = true;
                 break;
             }

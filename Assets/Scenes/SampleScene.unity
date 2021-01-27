@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -236,7 +237,7 @@ MonoBehaviour:
   nodeRendererPrefab: {fileID: 1305801768243309914, guid: a891ae67386a149ed9ca54ed9c8015e3,
     type: 3}
   alignHorizontal: 1
-  nodeWidth: 1
+  nodeWidth: 1.5
   nodeHeight: 1
 --- !u!114 &1566792739
 MonoBehaviour:

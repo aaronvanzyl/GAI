@@ -5,6 +5,18 @@ using UnityEngine;
 
 public static class ActionGenerator
 {
+    struct BuyOption {
+        public Merchant merchant;
+        public float dist;
+        public int saleEntryIndex;
+
+        public BuyOption(Merchant merchant, float dist, int saleEntryIndex)
+        {
+            this.merchant = merchant;
+            this.dist = dist;
+            this.saleEntryIndex = saleEntryIndex;
+        }
+    }
 
     public static List<Action> Satisfy(Condition condition, IWorldState worldState, int maxActions) {
         switch (condition) {
@@ -20,20 +32,31 @@ public static class ActionGenerator
 
     public static List<Action> Satisfy(PossessCondition condition, IWorldState worldState, int maxActions) {
         Debug.Log("Satisfying possessCond");
-        List<Tuple<Merchant,float>> merchantDists = new List<Tuple<Merchant, float>>();
+
+        List<BuyOption> options = new List<BuyOption>();
         IEntity owner = worldState.GetEntity(condition.ownerId);
         foreach (Merchant m in worldState.GetMerchants()) {
-            if (m.SellsType(condition.itemType)) {
+            int bestIndex = -1;
+            for (int i = 0; i < m.saleEntries.Count; i++) {
+                if (condition.itemFilter.Satisfied(m.saleEntries[i].itemTemplate.Expected()))
+                {
+                    if (bestIndex == -1 || m.saleEntries[bestIndex].price < m.saleEntries[i].price) {
+                        bestIndex = i;
+                    }
+                }
+            }
+            if (bestIndex != -1)
+            {
                 float dist = PathFinder.EstimateDistance(owner.Position, m.position);
-                merchantDists.Add(new Tuple<Merchant, float>(m,dist));
+                options.Add(new BuyOption(m, dist, bestIndex));
             }
         }
-        Debug.Log($"Found {merchantDists.Count} merchants");
+        Debug.Log($"Found {options.Count} options");
 
-        merchantDists.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+        options.Sort((x, y) => x.dist.CompareTo(y.dist));
         List<Action> actions = new List<Action>();
-        for (int i = 0; i < Mathf.Min(maxActions,merchantDists.Count); i++) {
-            BuyAction buyAction = new BuyAction(worldState, condition.ownerId, condition.itemType, merchantDists[i].Item1.id);
+        for (int i = 0; i < Mathf.Min(maxActions, options.Count); i++) {
+            BuyAction buyAction = new BuyAction(worldState, condition.ownerId, options[i].saleEntryIndex, options[i].merchant.id);
             actions.Add(buyAction);
         }
         return actions;
