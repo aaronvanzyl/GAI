@@ -50,9 +50,15 @@ public class RealizedEntity : IEntity
         }
     }
 
-    public Item GetEquippedItem(ItemSlot slot)
+    public bool TryGetEquippedItem(ItemSlot slot, out Item item)
     {
-        return equippedItems[(int)slot];
+        if (equippedItems[(int)slot] != null)
+        {
+            item = equippedItems[(int)slot];
+            return true;
+        }
+        item = null;
+        return false;
     }
 
     public void UnequipSlot(ItemSlot slot)

@@ -2,20 +2,47 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EquipAction : MonoBehaviour
+public class EquipAction : Action
 {
-    public Item item;
+    public int entityId;
+    public ItemFilter itemFilter;
 
 
-    // Start is called before the first frame update
-    void Start()
+    public EquipAction(IWorldState worldState, int entityId, ItemFilter itemFilter)
     {
-        
+        this.entityId = entityId;
+        this.itemFilter = itemFilter;
+        GenerateConditions(worldState);
     }
 
-    // Update is called once per frame
-    void Update()
+    public override float EstimateCost(IWorldState worldState)
     {
-        
+        return 0;
+    }
+
+    public override ActionOutcome Execute(IWorldState worldState, float duration)
+    {
+        ExecuteImmediate(worldState);
+        return ActionOutcome.Complete;
+    }
+
+    public override void ExecuteImmediate(IWorldState worldState)
+    {
+        IEntity entity = worldState.GetEntity(entityId);
+        foreach (Item item in entity.GetInventory())
+        {
+            if (itemFilter.Satisfied(item) && item.equippable)
+            {
+                entity.EquipItem(item, item.slot);
+                return;
+            }
+        }
+    }
+
+    protected override void GenerateConditions(IWorldState worldState)
+    {
+        conditions = new List<Condition>();
+        PossessCondition possessCond = new PossessCondition(entityId, itemFilter);
+        conditions.Add(possessCond);
     }
 }

@@ -4,21 +4,20 @@ using UnityEngine;
 
 public class ItemFilter
 {
+    // The min power needed depending on which slot the item can be equipped
+    // If the item is not equippable, this is ignored
     public float[] minPower = new float[Item.numItemSlots];
+    public bool requireEquippable;
     public float minFoodAmount = 0;
 
     public bool Satisfied(Item item) {
         if (item.foodAmount < minFoodAmount) {
             return false;
         }
-        bool satisfiesPower = false;
-        for (int i = 0; i < Item.numItemSlots; i++) {
-            if (minPower[i] == 0 || (item.equippable[i] && item.power >= minPower[i])) {
-                satisfiesPower = true;
-                break;
-            }
+        if (requireEquippable && !item.equippable) {
+            return false;
         }
-        if (!satisfiesPower) {
+        if (item.equippable && item.power < minPower[(int)item.slot]) {
             return false;
         }
         return true;

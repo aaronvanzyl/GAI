@@ -8,24 +8,33 @@ public class Item
 {
     public static readonly int numItemSlots = 2;
 
-    public string name;
+    public string name = "";
     public float foodAmount = 0;
-    public bool[] equippable = new bool[numItemSlots];
+    public ItemSlot slot = 0;
+    public bool equippable = false;
     public float power = 0;
 
-    public Item(string name, float foodAmount = 0, float power = 0) {
-        this.name = name;
-        this.foodAmount = foodAmount;
-        this.power = power;
-    }
+    //public Item(string name, float foodAmount = 0, float power = 0, ItemSlot slot = 0, bool equippable = false) {
+    //    this.name = name;
+    //    this.foodAmount = foodAmount;
+    //    this.power = power;
+    //    this.slot = slot;
+    //    this.equippable = equippable;
+    //}
 
-    public virtual Item Clone() {
-        Item clone = new Item(name);
+    //public Item(string name)
+    //{
+    //    this.name = name;
+    //}
+
+    public virtual Item Clone()
+    {
+        Item clone = new Item();
+        clone.name = name;
         clone.foodAmount = foodAmount;
-        for (int i = 0; i < numItemSlots; i++) {
-            clone.equippable[i] = equippable[i];
-            clone.power = power;
-        }
+        clone.slot = slot;
+        clone.equippable = equippable;
+        clone.power = power;
         return clone;
     }
 }
