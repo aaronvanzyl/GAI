@@ -41,7 +41,7 @@ public static class PlanGenerator
 
         Debug.Log($"Condition of type {nextCond.GetType()}");
 
-        List<Action> actions = ActionGenerator.Satisfy(nextCond, worldState, width);
+        List<Action> actions = nextCond.GenerateSatisfyingActions(worldState, width);
         Debug.Log($"Evaluating {actions.Count} possible actions");
         foreach (Action a in actions)
         {

@@ -12,6 +12,11 @@ public class PowerCondition : Condition
         this.entityId = entityId;
     }
 
+    public override List<Action> GenerateSatisfyingActions(IWorldState worldState, int maxActions)
+    {
+        return new List<Action>();
+    }
+
     override public bool Satisfied(IWorldState worldState)
     {
         IEntity owner = worldState.GetEntity(entityId);

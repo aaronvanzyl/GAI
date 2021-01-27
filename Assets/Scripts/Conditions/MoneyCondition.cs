@@ -23,4 +23,9 @@ public class MoneyCondition : Condition
     {
         return $"entity:{entityID}\nmoney:{money}";
     }
+
+    public override List<Action> GenerateSatisfyingActions(IWorldState worldState, int maxActions)
+    {
+        return new List<Action>();
+    }
 }

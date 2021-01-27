@@ -11,4 +11,5 @@ public abstract class Action
     public abstract void ExecuteImmediate(IWorldState worldState);
     public abstract float EstimateCost(IWorldState worldState);
     protected abstract void GenerateConditions(IWorldState worldState);
+    
 }

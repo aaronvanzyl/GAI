@@ -23,4 +23,12 @@ public class LocationCondition : Condition
     {
         return $"entity:{entityID}\npos:{position}";
     }
+
+    public override List<Action> GenerateSatisfyingActions(IWorldState worldState, int maxActions)
+    {
+        List<Action> actions = new List<Action>();
+        MoveAction moveAction = new MoveAction(worldState, entityID, position);
+        actions.Add(moveAction);
+        return actions;
+    }
 }
