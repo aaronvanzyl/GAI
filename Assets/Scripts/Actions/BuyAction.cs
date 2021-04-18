@@ -45,10 +45,11 @@ public class BuyAction : Action
     {
         Merchant merchant = worldState.GetMerchant(merchantId);
         conditions = new List<Condition>();
-        LocationCondition locationCond = new LocationCondition(buyerId, merchant.position);
-        conditions.Add(locationCond);
         MoneyCondition moneyCond = new MoneyCondition(buyerId, merchant.saleEntries[saleEntryIndex].price);
         conditions.Add(moneyCond);
+        LocationCondition locationCond = new LocationCondition(buyerId, merchant.position);
+        conditions.Add(locationCond);
+        
     }
 
     public override string ToString()

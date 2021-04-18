@@ -1,0 +1,15 @@
+Expression
+- List of tuples of variable/coefficient
+
+
+
+Each condition stores values as Expressions
+
+PossessCondition
+- type: int
+- amount: Expression
+
+BuyAction
+- type: int
+- amount: Expression
+

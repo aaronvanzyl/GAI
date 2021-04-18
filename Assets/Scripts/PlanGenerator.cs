@@ -5,17 +5,17 @@ using UnityEngine;
 
 public static class PlanGenerator
 {
-    public static ConditionNode GeneratePlan (Condition condition, IWorldState worldState, int depth, int width) 
-    { 
-        Stack<Condition> stack = new Stack<Condition>();
-        stack.Push(condition);
+    public static ConditionNode GeneratePlan(Condition condition, IWorldState worldState, int depth, int width)
+    {
+        LinkedList<Condition> stack = new LinkedList<Condition>();
+        stack.AddFirst(condition);
         ConditionNode topNode = FillTree(stack, worldState, depth, width);
         return topNode;
     }
 
     // ConditionNode(s) + ActionNode
     // Returns top node
-    static ConditionNode FillTree(Stack<Condition> unsatisfied, IWorldState worldState, int depth, int width)
+    static ConditionNode FillTree(LinkedList<Condition> unsatisfied, IWorldState worldState, int depth, int width)
     {
         Debug.Log($"Filling Tree: depth: {depth}, unsatisfied: {unsatisfied.Count}");
         if (depth == 0 || unsatisfied.Count == 0)
@@ -23,16 +23,22 @@ public static class PlanGenerator
             return null;
         }
 
-        Condition nextCond = unsatisfied.Pop();
+        // Get the next condition that we need to satisfy
+        Condition nextCond = unsatisfied.First.Value;
+        unsatisfied.RemoveFirst();
         ConditionNode nextCondNode = new ConditionNode(nextCond);
+        // Top node will always point to the first pulled condition, it is the root node of the subtree
         ConditionNode topNode = nextCondNode;
         while (nextCond.Satisfied(worldState))
         {
-            if(unsatisfied.Count==0)
+            // All conditions are satisfied, return
+            if (unsatisfied.Count == 0)
             {
                 return topNode;
             }
-            nextCond = unsatisfied.Pop();
+            nextCond = unsatisfied.First.Value;
+            unsatisfied.RemoveFirst();
+            // Create next node and link
             ConditionNode tempNode = new ConditionNode(nextCond);
             tempNode.outNode = nextCondNode;
             nextCondNode.inNodes.Add(tempNode);
@@ -46,19 +52,31 @@ public static class PlanGenerator
         foreach (Action a in actions)
         {
             Debug.Log($"Action of type {a.GetType()} with {a.conditions.Count} conditions");
-            Node tempOutNode = nextCondNode;
+            // Pointer to the following node in sequence
+
             bool conflictingConds = false;
-            while (tempOutNode != null) {
-                if (tempOutNode is ConditionNode) {
-                    Condition futureCond = ((ConditionNode)tempOutNode).condition;
-                    foreach (Condition c in a.conditions) {
-                        if (futureCond.Conflicts(c)) {
+
+            foreach (Condition c in a.conditions)
+            {
+                if (c.Satisfied(worldState))
+                {
+                    continue;
+                }
+                Node tempOutNode = nextCondNode;
+                // Check for conflicts with following conditions
+                while (tempOutNode != null)
+                {
+                    if (tempOutNode is ConditionNode)
+                    {
+                        Condition futureCond = ((ConditionNode)tempOutNode).condition;
+                        if (futureCond.Conflicts(c))
+                        {
                             conflictingConds = true;
                             break;
                         }
                     }
+                    tempOutNode = tempOutNode.outNode;
                 }
-                tempOutNode = tempOutNode.outNode;
                 if (conflictingConds)
                 {
                     break;
@@ -69,49 +87,40 @@ public static class PlanGenerator
                 Debug.Log($"Rejecting because of conflicting conditions");
                 continue;
             }
+
+
+            // Create a node for this action and link
             ActionNode aNode = new ActionNode(a);
             aNode.outNode = nextCondNode;
             nextCondNode.inNodes.Add(aNode);
 
-            Stack<Condition> newConds = new Stack<Condition>(unsatisfied);
-            if (a.conditions!=null)
+            // Clone the unsatisfied conditions and add any new conditions
+            LinkedList<Condition> newConds = new LinkedList<Condition>(unsatisfied);
+            if (a.conditions != null)
             {
-                //Stack<ConditionNode> newConds = new Stack<ConditionNode>(unsatisfied);
-                //ConditionNode[] tempNodes = new ConditionNode[a.conditions.Count];
-                //for (int i = 0; i < a.conditions.Count; i++)
-                //{
-                //    tempNodes[i] = new ConditionNode(a.conditions[i]);
-                //}
-                //for (int i = 0; i < a.conditions.Count; i++)
-                //{
-                //    newConds.Push(tempNodes[i]);
-                //    if (i == a.conditions.Count - 1)
-                //    {
-                //        tempNodes[i].outNode = aNode;
-                //        aNode.inNodes.Add(tempNodes[i]);
-                //    }
-                //    else
-                //    {
-                //        tempNodes[i].outNode = tempNodes[i + 1];
-                //        tempNodes[i + 1].inNodes.Add(tempNodes[i]);
-                //    }
-                //}
-                //FillTree(tempNodes[0], newConds, worldState, depth - 1, width);
-                
-                foreach (Condition c in a.conditions) {
-                    newConds.Push(c);
+                foreach (Condition c in a.conditions)
+                {
+                    foreach (Condition existing in newConds)
+                    {
+                        if (c.CanMerge(existing)) {
+                            c.Absorb(existing);
+                            newConds.Remove(existing);
+                        }
+                    }
+                    newConds.AddFirst(c);
                 }
             }
             if (newConds.Count > 0)
             {
                 ConditionNode following = FillTree(newConds, worldState, depth - 1, width);
-                if (following != null) {
+                if (following != null)
+                {
                     aNode.inNodes.Add(following);
                     following.outNode = aNode;
                 }
             }
         }
-        Debug.Log($"Returning {topNode.GetType()}, in: {topNode.inNodes.Count}, out: {topNode.outNode!=null}");
+        Debug.Log($"Returning {topNode.GetType()}, in: {topNode.inNodes.Count}, out: {topNode.outNode != null}");
         return topNode;
     }
 
